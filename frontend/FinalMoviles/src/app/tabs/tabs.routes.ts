@@ -49,12 +49,12 @@ export const routes: Routes = [
           import('../pages/admin/admin-cities.page').then((m) => m.AdminCitiesPage),
         canActivate: [adminGuard]
       },
-      // {
-      //   path: 'tab4/famosos',
-      //   loadComponent: () =>
-      //     import('../pages/admin/admin-famous.page').then((m) => m.AdminFamousPage),
-      //   canActivate: [adminGuard]
-      // },
+      {
+         path: 'tab4/famosos',
+         loadComponent: () =>
+           import('../pages/admin/admin-famous.page').then((m) => m.AdminFamousPage),
+         canActivate: [adminGuard]
+      },
       {
         path: 'tab4/sitios',
         loadComponent: () =>
@@ -89,16 +89,16 @@ export const routes: Routes = [
         loadComponent: () =>
           import('../pages/site/site-detail.page').then((m) => m.SiteDetailPage),
       },      // Famous people pages - TEMPORARILY DISABLED
-      // {
-      //   path: 'famosos/:id',
-      //   loadComponent: () =>
-      //     import('../pages/famous/famous-list.page').then((m) => m.FamousListPage),
-      // },
-      // {
-      //   path: 'famoso/:id',
-      //   loadComponent: () =>
-      //     import('../pages/famous/famous-detail.page').then((m) => m.FamousDetailPage),
-      // },
+      {
+         path: 'famosos/:id',
+         loadComponent: () =>
+           import('../pages/famous/famous-list.page').then((m) => m.FamousListPage),
+       },
+       {
+         path: 'famoso/:id',
+         loadComponent: () =>
+           import('../pages/famous/famous-detail.page').then((m) => m.FamousDetailPage),
+       },
       // Dish pages
       {
         path: 'platos/:id',

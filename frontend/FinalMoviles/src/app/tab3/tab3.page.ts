@@ -52,6 +52,20 @@ interface EncuentroWithLocation extends Encuentro {
     IonRefresher,
     IonRefresherContent
   ],
+  styles: [`
+    .visit-photo {
+      margin-top: 8px;
+      width: 100%;
+      max-height: 200px;
+      overflow: hidden;
+      border-radius: 8px;
+    }
+    .visit-photo img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+  `],
 })
 export class Tab3Page implements OnInit {
   segment: 'visitas' | 'encuentros' = 'visitas';
@@ -116,7 +130,7 @@ export class Tab3Page implements OnInit {
       }
     });
   }
-    loadVisitas() {
+  loadVisitas() {
     this.apiService.getVisitas().subscribe(visitas => {
       this.visitas = visitas;
       

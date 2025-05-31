@@ -205,19 +205,90 @@ export class SiteDetailPage implements OnInit {
     }
   }
 
+  private normalizarTexto(texto: string): string {
+    if (!texto) return '';
+    return texto
+      .toLowerCase()
+      .trim()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-zA-Z0-9\s]/g, "")
+      .replace(/\s+/g, " "); // Reduce múltiples espacios a uno solo
+  }
+
+  private palabrasDelTexto(texto: string): string[] {
+    return this.normalizarTexto(texto)
+      .split(' ')
+      .filter(palabra => palabra.length > 2); // Ignorar palabras muy cortas
+  }
+
   private async registrarVisitaConFoto() {
     try {
+      const position = await Geolocation.getCurrentPosition();
+      
+      const locationInfo = await this.apiService.getLocationInfo(
+        position.coords.latitude,
+        position.coords.longitude
+      ).toPromise();
+
+      if (!locationInfo?.address) {
+        await this.mostrarMensajeError('No se pudo verificar la ubicación actual');
+        return;
+      }
+
+      // Obtener palabras clave de la ciudad del sitio
+      const palabrasCiudadSitio = this.palabrasDelTexto(this.ciudadNombre);
+      
+      // Obtener palabras clave de la ubicación actual
+      const ubicacionActualCompleta = [
+        locationInfo.address.city,
+        locationInfo.address.town,
+        locationInfo.address.state
+      ]
+        .filter((loc): loc is string => Boolean(loc))
+        .join(' ');
+      
+      const palabrasUbicacionActual = this.palabrasDelTexto(ubicacionActualCompleta);
+
+      // Verificar si alguna palabra coincide
+      const coincidenciaPalabras = palabrasCiudadSitio.some(palabraSitio =>
+        palabrasUbicacionActual.some(palabraActual => 
+          palabraActual === palabraSitio
+        )
+      );
+
+      if (!coincidenciaPalabras) {
+        const ubicacionActualMostrar = [
+          locationInfo.address.city,
+          locationInfo.address.town,
+          locationInfo.address.state
+        ]
+          .filter(Boolean)
+          .join(', ');
+        
+        await this.mostrarMensajeError(
+          `No puedes registrar la visita desde esta ubicación.\n` +
+          `El sitio está en ${this.ciudadNombre}\n` +
+          `Tu ubicación actual: ${ubicacionActualMostrar}`
+        );
+        
+        // Para debugging
+        console.log('Palabras ciudad del sitio:', palabrasCiudadSitio);
+        console.log('Palabras ubicación actual:', palabrasUbicacionActual);
+        return;
+      }
+
+      // Si la ubicación es correcta, proceder con la foto
       const image = await Camera.getPhoto({
-        quality: 50, // Reducir calidad
+        quality: 50,
         allowEditing: true,
         resultType: CameraResultType.Base64,
         source: CameraSource.Camera,
-        width: 1024, // Limitar ancho
-        height: 1024, // Limitar alto
+        width: 1024,
+        height: 1024,
         correctOrientation: true
       });
 
-      const position = await Geolocation.getCurrentPosition();
       const visita = await this.apiService.createVisita(
         this.sitioId, 
         image.base64String, 
@@ -230,7 +301,7 @@ export class SiteDetailPage implements OnInit {
       await this.mostrarMensajeExito('Visita registrada correctamente con foto');
     } catch (error) {
       console.error('Error al registrar visita:', error);
-      await this.mostrarMensajeError();
+      await this.mostrarMensajeError('Error al registrar la visita');
     }
   }
 
@@ -244,10 +315,10 @@ export class SiteDetailPage implements OnInit {
     await toast.present();
   }
 
-  private async mostrarMensajeError() {
+  private async mostrarMensajeError(mensaje: string = 'Error al registrar la visita') {
     const toast = await this.toastController.create({
-      message: 'Error al registrar la visita',
-      duration: 2000,
+      message: mensaje,
+      duration: 3000,
       position: 'top',
       color: 'danger'
     });
