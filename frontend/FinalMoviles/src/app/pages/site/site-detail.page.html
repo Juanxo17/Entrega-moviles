@@ -1,0 +1,100 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/tab2"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ sitio?.nombre || 'Detalles del Sitio' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-toast></ion-toast>
+  
+  <div *ngIf="loading" class="ion-padding ion-text-center">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Cargando información...</p>
+  </div>
+
+  <div *ngIf="error" class="ion-padding ion-text-center">
+    <ion-icon name="alert-circle-outline" size="large" color="danger"></ion-icon>
+    <p>Error al cargar la información. Intenta de nuevo.</p>
+    <ion-button (click)="loadData()">Reintentar</ion-button>
+  </div>
+
+  <div *ngIf="!loading && !error && sitio">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ sitio.nombre }}</ion-card-title>
+        <ion-card-subtitle *ngIf="ciudadNombre">{{ ciudadNombre }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <p *ngIf="sitio.descripcion">{{ sitio.descripcion }}</p>
+        <p *ngIf="!sitio.descripcion">Sitio turístico en {{ ciudadNombre }}</p>
+        
+        <div class="action-buttons ion-padding-top">
+          <ion-button expand="block" color="primary" (click)="registrarVisita()">
+            <ion-icon name="bookmark" slot="start"></ion-icon>
+            Registrar Visita
+          </ion-button>
+          
+          <ion-button expand="block" color="secondary" (click)="crearTag()">
+            <ion-icon name="people" slot="start"></ion-icon>
+            Registrar Encuentro con Famoso
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12">
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>
+                <ion-icon name="restaurant"></ion-icon> Platos Típicos
+              </ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-list lines="none" *ngIf="platos.length > 0">
+                <ion-item *ngFor="let item of platos">
+                  <ion-label>
+                    {{ item.nombre }}
+                    <p *ngIf="item.precio">Precio: ${{ item.precio }}</p>
+                  </ion-label>
+                </ion-item>
+              </ion-list>
+              <p *ngIf="platos.length === 0" class="ion-text-center">
+                No hay platos registrados para este sitio.
+              </p>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+
+      <ion-row>
+        <ion-col size="12">
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>
+                <ion-icon name="people"></ion-icon> Encuentros Registrados
+              </ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-list lines="none" *ngIf="tags.length > 0">
+                <ion-item *ngFor="let tag of tags">
+                  <ion-label>
+                    {{ tag.nombre }}
+                    <p>{{ tag.fecha | date:'mediumDate' }}</p>
+                  </ion-label>
+                </ion-item>
+              </ion-list>
+              <p *ngIf="tags.length === 0" class="ion-text-center">
+                No hay encuentros registrados en este sitio.
+              </p>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+</ion-content>

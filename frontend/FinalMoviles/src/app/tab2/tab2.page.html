@@ -1,0 +1,100 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      {{ section === 'paises' ? 'Explorar Países' : (selectedPais?.nombre || 'Explorar') }}
+    </ion-title>
+    <ion-button *ngIf="section !== 'paises'" slot="start" (click)="goBack()" fill="clear">
+      <ion-icon name="arrow-back"></ion-icon>
+      Atrás
+    </ion-button>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Lista de países -->
+  <ng-container *ngIf="section === 'paises'">
+    <div *ngIf="loading" class="ion-padding ion-text-center">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando países...</p>
+    </div>
+
+    <div *ngIf="error" class="ion-padding ion-text-center">
+      <ion-icon name="alert-circle-outline" size="large" color="danger"></ion-icon>
+      <p>Error al cargar los países. Intenta de nuevo.</p>
+    </div>    <ion-list *ngIf="!loading && !error">
+      <ion-item-sliding *ngFor="let pais of paises">
+        <ion-item (click)="selectPais(pais)">
+          <ion-icon name="globe" slot="start"></ion-icon>
+          <ion-label>
+            <h2>{{ pais.nombre }}</h2>
+          </ion-label>
+        </ion-item>
+        
+        <!-- Admin options for editing/deleting countries -->
+        <ion-item-options side="end" *ngIf="isAdmin">
+          <ion-item-option color="primary" (click)="editCountry(pais)">
+            <ion-icon name="create"></ion-icon>
+            Editar
+          </ion-item-option>
+          <ion-item-option color="danger" (click)="confirmDeleteCountry(pais)">
+            <ion-icon name="trash"></ion-icon>
+            Eliminar
+          </ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
+    </ion-list>
+  </ng-container>
+
+  <!-- Contenido específico de país -->
+  <ng-container *ngIf="section === 'ciudades' && selectedPais">
+    <div class="ion-padding">
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>{{ selectedPais.nombre }}</ion-card-title>
+        </ion-card-header>
+
+        <ion-card-content>
+          <p>Selecciona una categoría para explorar:</p>
+        </ion-card-content>
+      </ion-card>      <div class="category-grid">
+        <ion-card button [routerLink]="['/tabs/ciudades', selectedPais._id]">
+          <ion-card-content class="center-content">
+            <ion-icon name="business" size="large"></ion-icon>
+            <p>Ciudades</p>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card button [routerLink]="['/tabs/famosos', selectedPais._id]">
+          <ion-card-content class="center-content">
+            <ion-icon name="people" size="large"></ion-icon>
+            <p>Famosos</p>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card button [routerLink]="['/tabs/sitios', selectedPais._id]">
+          <ion-card-content class="center-content">
+            <ion-icon name="location" size="large"></ion-icon>
+            <p>Sitios</p>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card button [routerLink]="['/tabs/platos', selectedPais._id]">
+          <ion-card-content class="center-content">
+            <ion-icon name="restaurant" size="large"></ion-icon>
+            <p>Platos</p>
+          </ion-card-content>
+        </ion-card>      </div>
+    </div>
+  </ng-container>
+
+  <!-- FAB button for adding new countries (only visible to admins) -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="section === 'paises' && isAdmin">
+    <ion-fab-button (click)="openCreateCountryModal()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

@@ -1,0 +1,57 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/tab2"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ plato?.nombre || 'Detalles del Plato' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div *ngIf="loading" class="ion-padding ion-text-center">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Cargando información...</p>
+  </div>
+
+  <div *ngIf="error" class="ion-padding ion-text-center">
+    <ion-icon name="alert-circle-outline" size="large" color="danger"></ion-icon>
+    <p>Error al cargar la información. Intenta de nuevo.</p>
+    <ion-button (click)="loadData()">Reintentar</ion-button>
+  </div>
+
+  <div *ngIf="!loading && !error && plato">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ plato.nombre }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p *ngIf="plato.descripcion">{{ plato.descripcion }}</p>
+        
+        <div class="ion-padding-top">
+          <ion-item lines="none" *ngIf="plato.precio">
+            <ion-icon name="pricetag" slot="start"></ion-icon>
+            <ion-label>
+              <h3>Precio</h3>
+              <p>${{ plato.precio }}</p>
+            </ion-label>
+          </ion-item>          <ion-item lines="none" *ngIf="sitioNombre" [routerLink]="['/tabs/sitio', getSitioId()]">
+            <ion-icon name="location" slot="start"></ion-icon>
+            <ion-label>
+              <h3>Disponible en</h3>
+              <p>{{ sitioNombre }}</p>
+            </ion-label>
+            <ion-icon name="chevron-forward" slot="end"></ion-icon>
+          </ion-item>
+
+          <ion-item lines="none" *ngIf="paisNombre">
+            <ion-icon name="globe" slot="start"></ion-icon>
+            <ion-label>
+              <h3>País</h3>
+              <p>{{ paisNombre }}</p>
+            </ion-label>
+          </ion-item>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

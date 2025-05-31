@@ -1,0 +1,56 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/tab4"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Gestión de Platos</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div *ngIf="loading" class="ion-text-center">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Cargando platos...</p>
+  </div>
+
+  <div *ngIf="error" class="ion-padding ion-text-center">
+    <ion-icon name="alert-circle-outline" size="large" color="danger"></ion-icon>
+    <p>Error al cargar los platos. Intenta de nuevo.</p>
+    <ion-button (click)="loadDishes()">Reintentar</ion-button>
+  </div>
+
+  <ion-card *ngIf="!loading && !error">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="restaurant"></ion-icon>
+        Lista de Platos
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list *ngIf="dishes.length > 0">
+        <ion-item *ngFor="let dish of dishes">          <ion-label>
+            <h2>{{ dish.nombre }}</h2>
+            <p>Precio: ${{ dish.precio }}</p>
+            <p>País: {{ getPaisName(dish.pais) }}</p>
+            <p>Sitio: {{ getSitioName(dish.sitio) }}</p>
+          </ion-label>
+          <ion-button slot="end" (click)="editDish(dish)">
+            <ion-icon name="create"></ion-icon>
+          </ion-button>
+          <ion-button slot="end" color="danger" (click)="deleteDish(dish._id!)">
+            <ion-icon name="trash"></ion-icon>
+          </ion-button>
+        </ion-item>
+      </ion-list>
+      <div *ngIf="dishes.length === 0" class="ion-text-center">
+        <p>No hay platos registrados</p>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="addDish()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>
