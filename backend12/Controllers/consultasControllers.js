@@ -25,7 +25,16 @@ export const topSitiosPorPais = async (req, res) => {
         },
       },
       { $unwind: '$sitioInfo' },
-      { $match: { 'sitioInfo.pais': pais._id } },
+      {
+        $lookup: {
+          from: 'ciudads',
+          localField: 'sitioInfo.ciudad',
+          foreignField: '_id',
+          as: 'ciudadInfo',
+        },
+      },
+      { $unwind: '$ciudadInfo' },
+      { $match: { 'ciudadInfo.pais': pais._id } },
       {
         $group: {
           _id: '$sitio',
